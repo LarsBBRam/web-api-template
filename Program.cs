@@ -18,8 +18,6 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddSingleton<ITaskContext, TaskContext>();
 
-
-
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -28,6 +26,9 @@ public class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        // Swagger er ikke auto-inkludert i net9.0
+
 
         app.UseStaticFiles();
 
@@ -43,10 +44,16 @@ public class Program
 
         app.MapGet("/tasks/pending", (ITaskContext context) => context.GetPendingTasks());
 
+        app.MapGet("/tasks/{id}", (int id, ITaskContext context) => context.GetTaskById(id));
+
+        app.MapPatch("/tasks/complete/{id}", (int id, ITaskContext context) => context.CompleteTask(id));
+
+        app.MapDelete("/tasks/{id}", (int id, ITaskContext context) => context.DeleteTask(id));
+
+        app.MapPost("/tasks", (string title, string description, DateTime dueDate, ITaskContext context) => context.AddTask(title, description, dueDate));
+
         app.Run();
     }
 }
 
 
-
-ER PÅ MINUTT 24!
