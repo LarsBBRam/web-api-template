@@ -16,6 +16,7 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddControllers();
         builder.Services.AddSingleton<ITaskContext, TaskContext>();
 
         var app = builder.Build();
@@ -51,6 +52,9 @@ public class Program
         app.MapDelete("/tasks/{id}", (int id, ITaskContext context) => context.DeleteTask(id));
 
         app.MapPost("/tasks", (string title, string description, DateTime dueDate, ITaskContext context) => context.AddTask(title, description, dueDate));
+
+        app.MapControllers();
+
 
         app.Run();
     }
