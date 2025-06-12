@@ -17,6 +17,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddControllers();
+        builder.Services.AddLogging();
         builder.Services.AddSingleton<ITaskContext, TaskContext>();
 
         var app = builder.Build();
@@ -38,23 +39,23 @@ public class Program
         app.UseHttpsRedirection();
 
         app.MapGet("/helloworld", () => "Hello, World");
+        /*
+            app.MapGet("/tasks", (ITaskContext context) => context.GetAllTasks());
 
-        app.MapGet("/tasks", (ITaskContext context) => context.GetAllTasks());
+            app.MapGet("/tasks/complete", (ITaskContext context) => context.GetCompleteTasks());
 
-        app.MapGet("/tasks/complete", (ITaskContext context) => context.GetCompleteTasks());
+            app.MapGet("/tasks/pending", (ITaskContext context) => context.GetPendingTasks());
 
-        app.MapGet("/tasks/pending", (ITaskContext context) => context.GetPendingTasks());
+            app.MapGet("/tasks/{id}", (int id, ITaskContext context) => context.GetTaskById(id));
 
-        app.MapGet("/tasks/{id}", (int id, ITaskContext context) => context.GetTaskById(id));
+            app.MapPatch("/tasks/complete/{id}", (int id, ITaskContext context) => context.CompleteTask(id));
 
-        app.MapPatch("/tasks/complete/{id}", (int id, ITaskContext context) => context.CompleteTask(id));
+            app.MapDelete("/tasks/{id}", (int id, ITaskContext context) => context.DeleteTask(id));
 
-        app.MapDelete("/tasks/{id}", (int id, ITaskContext context) => context.DeleteTask(id));
+            app.MapPost("/tasks", (string title, string description, DateTime dueDate, ITaskContext context) => context.AddTask(title, description, dueDate));
 
-        app.MapPost("/tasks", (string title, string description, DateTime dueDate, ITaskContext context) => context.AddTask(title, description, dueDate));
-
+        */
         app.MapControllers();
-
 
         app.Run();
     }
