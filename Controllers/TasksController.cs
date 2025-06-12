@@ -16,19 +16,21 @@ public class TasksController(ITaskContext context, ILogger<TasksController> logg
         return Ok(context.GetAllTasks());
     }
 
-    [HttpGet("/complete")]
+    [HttpGet("complete")]
     public IActionResult GetComplete()
     {
         return Ok(context.GetCompleteTasks());
     }
 
-    [HttpGet("/pending")]
+    [HttpGet("pending")]
     public IActionResult GetPending()
     {
         return Ok(context.GetPendingTasks());
     }
 
-    [HttpGet("/{id}")]
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult Get(int id)
     {
         var task = context.GetTaskById(id);
@@ -36,7 +38,9 @@ public class TasksController(ITaskContext context, ILogger<TasksController> logg
         return Ok(task);
     }
 
-    [HttpPatch("/complete/{id}")]
+    [HttpPatch("complete/{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status418ImATeapot)]
     public IActionResult Patch(int id)
     {
         var completedTask = context.CompleteTask(id);
@@ -44,7 +48,9 @@ public class TasksController(ITaskContext context, ILogger<TasksController> logg
         else return NotFound();
     }
 
-    [HttpDelete("/id")]
+    [HttpDelete("id")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public IActionResult Delete(int id)
     {
         var deletedTask = context.DeleteTask(id);
@@ -53,6 +59,8 @@ public class TasksController(ITaskContext context, ILogger<TasksController> logg
     }
 
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public IActionResult Post([FromBody] UserTaskDto dto)
     {
         return Ok(dto.InsertTask(context));
