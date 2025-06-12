@@ -10,7 +10,7 @@ namespace web_api_template.Controllers;
 public class TasksController(ITaskContext context, ILogger<TasksController> logger) : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get()
+    public IActionResult Get([FromQuery] QueryDto dto)
     {
         logger.LogInformation("Received Get request on standard route!");
         return Ok(context.GetAllTasks());
