@@ -1,23 +1,24 @@
+using Microsoft.EntityFrameworkCore;
 using web_api_template.Interfaces;
 
 namespace web_api_template.Models;
 
-public class TaskContext : ITaskContext
+public class TaskContext(DbContextOptions<TaskContext> options) : DbContext(options), ITaskContext
 {
-    private List<IUserTask> _tasks = [];
+    public DbSet<UserTask> Tasks { get; set; }
     private int _nextId;
-    public int Count => _tasks.Count;
+    public int Count => Tasks.Count();
 
     public IUserTask AddTask(string title, string description, DateTime dueDate)
     {
         var newTask = new UserTask(++_nextId, title, description, dueDate);
-        _tasks.Add(newTask);
+        Tasks.Add(newTask);
         return newTask;
     }
 
     public bool CompleteTask(int id)
     {
-        var task = _tasks.FirstOrDefault(task => task.Id == id);
+        var task = Tasks.FirstOrDefault(task => task.Id == id);
         if (task is null) return false;
         task.MarkAsCompleted();
         return true;
@@ -25,28 +26,29 @@ public class TaskContext : ITaskContext
 
     public bool DeleteTask(int id)
     {
-        var task = _tasks.FirstOrDefault(task => task.Id == id);
+        var task = Tasks.FirstOrDefault(task => task.Id == id);
         if (task is null) return false;
-        return _tasks.Remove(task);
+        Tasks.Remove(task);
+        return true;
     }
 
     public List<IUserTask> GetAllTasks()
     {
-        return _tasks;
+        return [.. Tasks];
     }
 
     public List<IUserTask> GetCompleteTasks()
     {
-        return [.. _tasks.Where(task => task.IsCompleted)];
+        return [.. Tasks.Where(task => task.IsCompleted)];
     }
 
     public List<IUserTask> GetPendingTasks()
     {
-        return [.. _tasks.Where(task => !task.IsCompleted)];
+        return [.. Tasks.Where(task => !task.IsCompleted)];
     }
 
-    public IUserTask? GetTaskById(int id)
+    public UserTask? GetTaskById(int id)
     {
-        return _tasks.FirstOrDefault(task => task.Id == id);
+        return Tasks.FirstOrDefault(task => task.Id == id);
     }
 }
