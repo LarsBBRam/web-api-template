@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using web_api_template.Interfaces;
 using web_api_template.Models;
@@ -10,30 +11,30 @@ namespace web_api_template.Controllers;
 public class TasksController(ITaskContext context, ILogger<TasksController> logger) : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get([FromQuery] QueryDto dto)
+    public async Task<IActionResult> Get([FromQuery] QueryDto dto)
     {
         logger.LogInformation("Received Get request on standard route!");
-        return Ok(context.GetAllTasks());
+        return Ok(await dto.BuildQuery(context));
     }
 
     [HttpGet("complete")]
-    public IActionResult GetComplete()
+    public async Task<IActionResult> GetComplete()
     {
-        return Ok(context.GetCompleteTasks());
+        return Ok(await context.GetCompleteTasks());
     }
 
     [HttpGet("pending")]
-    public IActionResult GetPending()
+    public async Task<IActionResult> GetPending()
     {
-        return Ok(context.GetPendingTasks());
+        return Ok(await context.GetPendingTasks());
     }
 
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        var task = context.GetTaskById(id);
+        var task = await context.GetTaskById(id);
         if (task is null) return NotFound();
         return Ok(task);
     }
@@ -41,9 +42,9 @@ public class TasksController(ITaskContext context, ILogger<TasksController> logg
     [HttpPatch("complete/{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status418ImATeapot)]
-    public IActionResult Patch(int id)
+    public async Task<IActionResult> Patch(int id)
     {
-        var completedTask = context.CompleteTask(id);
+        var completedTask = await context.CompleteTask(id);
         if (completedTask) return NoContent();
         else return NotFound();
     }
@@ -51,9 +52,9 @@ public class TasksController(ITaskContext context, ILogger<TasksController> logg
     [HttpDelete("id")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var deletedTask = context.DeleteTask(id);
+        var deletedTask = await context.DeleteTask(id);
         if (deletedTask) return NoContent();
         else return NotFound();
     }
@@ -61,9 +62,9 @@ public class TasksController(ITaskContext context, ILogger<TasksController> logg
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult Post([FromBody] UserTaskDto dto)
+    public async Task<IActionResult> Post([FromBody] UserTaskDto dto)
     {
-        return Ok(dto.InsertTask(context));
+        return Ok(await dto.InsertTask(context));
     }
 
 }

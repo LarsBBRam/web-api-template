@@ -1,20 +1,22 @@
+using web_api_template.Models;
+
 namespace web_api_template.Interfaces;
 
 public interface ITaskContext
 {
     int Count { get; }
 
-    List<IUserTask> GetAllTasks();
+    Task<List<UserTask>> GetAllTasks();
 
-    IUserTask? GetTaskById(int id);
+    Task<UserTask?> GetTaskById(int id);
 
-    List<IUserTask> GetPendingTasks();
+    Task<List<UserTask>> GetPendingTasks();
 
-    List<IUserTask> GetCompleteTasks();
+    Task<List<UserTask>> GetCompleteTasks();
 
-    bool CompleteTask(int id);
+    Task<bool> CompleteTask(int id);
 
-    bool DeleteTask(int id);
+    Task<bool> DeleteTask(int id);
 
-    IUserTask AddTask(string title, string description, DateTime dueDate);
+    Task<UserTask> AddTask(string title, string description, DateTime dueDate);
 }

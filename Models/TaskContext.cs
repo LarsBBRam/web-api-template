@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using web_api_template.Interfaces;
 
@@ -8,49 +9,49 @@ public class TaskContext(DbContextOptions<TaskContext> options) : DbContext(opti
     public DbSet<UserTask> Tasks { get; set; }
     public int Count => Tasks.Count();
 
-    public IUserTask AddTask(string title, string description, DateTime dueDate)
+    public async Task<UserTask> AddTask(string title, string description, DateTime dueDate)
     {
         var newTask = new UserTask(title, description, dueDate);
-        Tasks.Add(newTask);
-        SaveChanges();
+        await Tasks.AddAsync(newTask);
+        await SaveChangesAsync();
         return newTask;
     }
 
-    public bool CompleteTask(int id)
+    public async Task<bool> CompleteTask(int id)
     {
-        var task = Tasks.FirstOrDefault(task => task.Id == id);
+        var task = await Tasks.FirstOrDefaultAsync(task => task.Id == id);
         if (task is null) return false;
         task.IsCompleted = true;
-        SaveChanges();
+        await SaveChangesAsync();
         return true;
     }
 
-    public bool DeleteTask(int id)
+    public async Task<bool> DeleteTask(int id)
     {
-        var task = Tasks.FirstOrDefault(task => task.Id == id);
+        var task = await Tasks.FirstOrDefaultAsync(task => task.Id == id);
         if (task is null) return false;
         Tasks.Remove(task);
-        SaveChanges();
+        await SaveChangesAsync();
         return true;
     }
 
-    public List<IUserTask> GetAllTasks()
+    public async Task<List<UserTask>> GetAllTasks()
     {
-        return [.. Tasks.AsNoTracking()];
+        return await Tasks.ToListAsync();
     }
 
-    public List<IUserTask> GetCompleteTasks()
+    public async Task<List<UserTask>> GetCompleteTasks()
     {
-        return [.. Tasks.Where(task => task.IsCompleted).AsNoTracking()];
+        return await Tasks.Where(task => task.IsCompleted).ToListAsync();
     }
 
-    public List<IUserTask> GetPendingTasks()
+    public async Task<List<UserTask>> GetPendingTasks()
     {
-        return [.. Tasks.Where(task => !task.IsCompleted).AsNoTracking()];
+        return await Tasks.Where(task => !task.IsCompleted).ToListAsync();
     }
 
-    public IUserTask? GetTaskById(int id)
+    public Task<UserTask?> GetTaskById(int id)
     {
-        return Tasks.AsNoTracking().FirstOrDefault(task => task.Id == id);
+        return Tasks.AsNoTracking().FirstOrDefaultAsync(task => task.Id == id);
     }
 }

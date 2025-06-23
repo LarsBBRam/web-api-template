@@ -10,13 +10,15 @@ public class QueryDto
     public DateTime? StartDate { get; set; }
     public DateTime? EndDate { get; set; }
 
-    public IQueryable<IUserTask> BuildQuery(TaskContext context)
+    public async Task<IQueryable<IUserTask>> BuildQuery(ITaskContext context)
     {
-        var query = context.GetAllTasks().AsQueryable();
+        var list = await context.GetAllTasks();
+        var query = list.AsQueryable();
         if (!string.IsNullOrWhiteSpace(Title)) query = query.Where(task => task.Title.Contains(Title, StringComparison.InvariantCultureIgnoreCase));
         if (!string.IsNullOrWhiteSpace(Description)) query = query.Where(task => task.Description.Contains(Description, StringComparison.InvariantCultureIgnoreCase));
         if (StartDate.HasValue) query = query.Where(task => task.DueDate > StartDate);
         if (EndDate.HasValue) query = query.Where(task => task.DueDate < EndDate);
         return query;
     }
+
 }
