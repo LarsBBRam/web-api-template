@@ -6,13 +6,13 @@ namespace web_api_template.Models;
 public class TaskContext(DbContextOptions<TaskContext> options) : DbContext(options), ITaskContext
 {
     public DbSet<UserTask> Tasks { get; set; }
-    private int _nextId;
     public int Count => Tasks.Count();
 
     public IUserTask AddTask(string title, string description, DateTime dueDate)
     {
-        var newTask = new UserTask(++_nextId, title, description, dueDate);
+        var newTask = new UserTask(title, description, dueDate);
         Tasks.Add(newTask);
+        SaveChanges();
         return newTask;
     }
 
@@ -20,7 +20,8 @@ public class TaskContext(DbContextOptions<TaskContext> options) : DbContext(opti
     {
         var task = Tasks.FirstOrDefault(task => task.Id == id);
         if (task is null) return false;
-        task.MarkAsCompleted();
+        task.IsCompleted = true;
+        SaveChanges();
         return true;
     }
 
@@ -29,26 +30,27 @@ public class TaskContext(DbContextOptions<TaskContext> options) : DbContext(opti
         var task = Tasks.FirstOrDefault(task => task.Id == id);
         if (task is null) return false;
         Tasks.Remove(task);
+        SaveChanges();
         return true;
     }
 
     public List<IUserTask> GetAllTasks()
     {
-        return [.. Tasks];
+        return [.. Tasks.AsNoTracking()];
     }
 
     public List<IUserTask> GetCompleteTasks()
     {
-        return [.. Tasks.Where(task => task.IsCompleted)];
+        return [.. Tasks.Where(task => task.IsCompleted).AsNoTracking()];
     }
 
     public List<IUserTask> GetPendingTasks()
     {
-        return [.. Tasks.Where(task => !task.IsCompleted)];
+        return [.. Tasks.Where(task => !task.IsCompleted).AsNoTracking()];
     }
 
-    public UserTask? GetTaskById(int id)
+    public IUserTask? GetTaskById(int id)
     {
-        return Tasks.FirstOrDefault(task => task.Id == id);
+        return Tasks.AsNoTracking().FirstOrDefault(task => task.Id == id);
     }
 }

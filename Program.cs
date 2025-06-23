@@ -1,4 +1,5 @@
 
+using Microsoft.EntityFrameworkCore;
 using web_api_template.Interfaces;
 using web_api_template.Models;
 
@@ -18,7 +19,14 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddControllers();
         builder.Services.AddLogging();
-        builder.Services.AddSingleton<ITaskContext, TaskContext>();
+        builder.Services.AddDbContext<ITaskContext, TaskContext>(OptionsBuilder =>
+        {
+            OptionsBuilder.UseSqlite("Data Source=Tasks.db");
+        });
+
+
+
+
 
         var app = builder.Build();
 
